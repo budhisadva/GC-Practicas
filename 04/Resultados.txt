@@ -1,0 +1,90 @@
+Pruebas para Vector3:
+Producto punto de v1 y v2: 32
+Distancia entre v1 y v2: 5.19615
+Distancia al cuadrado entre v1 y v2: 27
+v1 y v2 son iguales: No
+v1 y v2 son exactamente iguales: No
+
+Pruebas para Matrix3:
+Suma de m1 y m2:
+2 2 3
+4 6 6
+7 8 10
+Resta de m2 y m1:
+0 2 3
+4 4 6
+7 8 8
+Multiplicación de m1 y m2:
+1 2 3
+4 5 6
+7 8 9
+Multiplicación de m2 por escalar 2.0:
+2 4 6
+8 10 12
+14 16 18
+No tiene inversa
+Inversa de m2:
+1 0 0
+0 1 0
+0 0 1
+Determinante de m2: 0
+Transpuesta de m2:
+1 4 7
+2 5 8
+3 6 9
+Matriz identidad:
+1 0 0
+0 1 0
+0 0 1
+Rotación de 45 grados:
+0.707107 -0.707107 0
+0.707107 0.707107 0
+0 0 1
+Escalamiento (2.0, 3.0):
+2 0 0
+0 3 0
+0 0 1
+Traslación (5.0, 10.0):
+1 0 5
+0 1 10
+0 0 1
+Suma de Vector4: (6, 8, 10, 12)
+Clon Vector4: (1, 2, 3, 4)
+Distancia Vector4: 8
+Prodcuto punto Vector4: 32
+Approximately Equal: false
+Exactly Equal: false
+Normalized Vector4: (0.182574, 0.365148, 0.547723, 0.730297)
+Difference Vector4: (5, 14, 23, 32)
+Squared Distance: 1774
+Vector a cero: (0, 0, 0, 0)
+Identidad Matrix4:
+ 1 0 0 0
+ 0 1 0 0
+ 0 0 1 0
+ 0 0 0 1
+Matrix 1 multiplicado por 2.0:
+ 2 0 0 0
+ 0 2 0 0
+ 0 0 2 0
+ 0 0 0 2
+Matrix 1 menos Matrix 2:
+ 15 15 14 13
+ 12 10 10 9
+ 8 7 5 5
+ 4 3 2 0
+Matrix 1 multiplied by Matrix 2:
+ 16 15 14 13
+ 12 11 10 9
+ 8 7 6 5
+ 4 3 2 1
+Transpose de Matrix 1:
+ 1 0 0 0
+ 0 1 0 0
+ 0 0 1 0
+ 0 0 0 1
+Inversa de Matrix 1:
+ 1 -0 0 -0
+ -0 1 -0 0
+ 0 -0 1 -0
+ -0 0 -0 1
