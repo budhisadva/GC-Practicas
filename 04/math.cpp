@@ -18,6 +18,13 @@ public:
     Vector3(double x = 0.0, double y = 0.0, double z = 0.0) : x(x), y(y), z(z) {}
 
     /**
+     * Métodos getter
+     */
+    double getX() const {return this->x;}
+    double getY() const {return this->y;}
+    double getZ() const {return this->z;}
+
+    /**
      * @brief Suma de dos vectores.
      * @param u Primer vector.
      * @param v Segundo vector.
@@ -173,6 +180,14 @@ public:
      * @param w Componente w del vector (por defecto 0).
      */
     Vector4(double x = 0, double y = 0, double z = 0, double w = 0) : x(x), y(y), z(z), w(w) {}
+
+    /**
+     * Métodos getter
+     */
+    double getX() const {return this->x;}
+    double getY() const {return this->y;}
+    double getZ() const {return this->z;}
+    double getW() const {return this->w;}
 
     /**
      * @brief Devuelve la suma de dos vectores.
@@ -344,7 +359,19 @@ public:
      * @return Matriz adjoint.
      */
     Matrix3 adjoint() const {
-      return Matrix3();
+      double det_m00 = (this->a11*this->a22)-(this->a12*this->a21);
+      double det_m01 = (this->a10*this->a22)-(this->a12*this->a20);
+      double det_m02 = (this->a10*this->a21)-(this->a11*this->a20);
+      double det_m10 = (this->a01*this->a22)-(this->a02*this->a21);
+      double det_m11 = (this->a00*this->a22)-(this->a02*this->a20);
+      double det_m12 = (this->a00*this->a21)-(this->a01*this->a20);
+      double det_m20 = (this->a01*this->a12)-(this->a02*this->a11);
+      double det_m21 = (this->a00*this->a12)-(this->a02*this->a10);
+      double det_m22 = (this->a00*this->a11)-(this->a01*this->a10);
+      Matrix3 cofactores(det_m00, -det_m01, det_m02,
+                         -det_m10, det_m11, -det_m12,
+                         det_m20, -det_m21, det_m22);
+      return cofactores.transpose();
     }
 
     /**
@@ -362,7 +389,10 @@ public:
      * @return Determinante de la matriz.
      */
     double determinant() const {
-      return 0;
+      double det_m00 = (this->a11*this->a22)-(this->a12*this->a21);
+      double det_m01 = (this->a10*this->a22)-(this->a12*this->a20);
+      double det_m02 = (this->a10*this->a21)-(this->a11*this->a20);
+      return this->a00*(det_m00) - this->a01*(det_m01) + this->a02*(det_m02);
     }
 
     /**
@@ -373,7 +403,16 @@ public:
      * @return Verdadero si las matrices son aproximadamente iguales.
      */
     static bool equalsWithE(const Matrix3& m1, const Matrix3& m2, double e) {
-      return 0;
+      bool b00 = fabs(m1.a00-m2.a00) <= e;
+      bool b01 = fabs(m1.a01-m2.a01) <= e;
+      bool b02 = fabs(m1.a02-m2.a02) <= e;
+      bool b10 = fabs(m1.a10-m2.a10) <= e;
+      bool b11 = fabs(m1.a11-m2.a11) <= e;
+      bool b12 = fabs(m1.a12-m2.a12) <= e;
+      bool b20 = fabs(m1.a20-m2.a20) <= e;
+      bool b21 = fabs(m1.a21-m2.a21) <= e;
+      bool b22 = fabs(m1.a22-m2.a22) <= e;
+      return b00 && b01 && b02 && b10 && b11 && b12 && b20 && b21 && b22;
     }
 
     /**
@@ -383,7 +422,8 @@ public:
      * @return Verdadero si las matrices son aproximadamente iguales.
      */
     static bool equals(const Matrix3& m1, const Matrix3& m2) {
-      return false;
+      double epsilon = 0.000001;
+      return Matrix3::equalsWithE(m1, m2, epsilon);
     }
 
     /**
@@ -393,7 +433,7 @@ public:
      * @return Verdadero si las matrices son exactamente iguales.
      */
     static bool exactEquals(const Matrix3& m1, const Matrix3& m2) {
-      return false;
+      return (m1.a00 == m2.a00)&&(m1.a01 == m2.a01)&&(m1.a02 == m2.a02)&&(m1.a10 == m2.a10)&&(m1.a11 == m2.a11)&&(m1.a12 == m2.a12)&&(m1.a20 == m2.a20)&&(m1.a21 == m2.a21)&&(m1.a22 == m2.a22);
     }
 
     /**
@@ -410,7 +450,13 @@ public:
      * @return Matriz inversa.
      */
     Matrix3 invert() const {
-      return Matrix3();
+      double det = this->determinant();
+      Matrix3 adjunta = this->adjoint();
+      if (det == 0) {
+        cout << "La matriz no tiene inversa" << endl;
+        return Matrix3();
+      }
+      return Matrix3::multiplyScalar(adjunta, (1/det));
     }
 
     /**
@@ -453,7 +499,9 @@ public:
      * @return Vector resultante de la multiplicación.
      */
     Vector3 multiplyVector(const Vector3& v) const {
-      return Vector3();
+      return Vector3(this->a00*v.getX()+this->a01*v.getY()+this->a02*v.getZ(),
+                     this->a10*v.getX()+this->a11*v.getY()+this->a12*v.getZ(),
+                     this->a20*v.getX()+this->a21*v.getY()+this->a22*v.getZ());
     }
 
     /**
@@ -462,7 +510,9 @@ public:
      * @return Matriz de rotación.
      */
     static Matrix3 rotate(double theta) {
-      return Matrix3();
+      return Matrix3(cos(theta), -sin(theta), 0,
+                     sin(theta), cos(theta), 0,
+                     0, 0, 1);
     }
 
     /**
@@ -472,7 +522,9 @@ public:
      * @return Matriz de escalamiento.
      */
     static Matrix3 scale(double sx, double sy) {
-      return Matrix3();
+      return Matrix3(sx, 0, 0,
+                     0, sy, 0,
+                     0, 0, 1);
     }
 
     /**
@@ -487,7 +539,13 @@ public:
      * @param a21 Elemento en la posición (2,1).
      * @param a22 Elemento en la posición (2,2).
      */
-    void set() {}
+    void set(double a00, double a01, double a02,
+             double a10, double a11, double a12,
+             double a20, double a21, double a22) {
+      this->a00 = a00; this->a01 = a01; this->a02 = a02;
+      this->a10 = a10; this->a11 = a11; this->a12 = a12;
+      this->a20 = a20; this->a21 = a21; this->a22 = a22;
+    }
 
     /**
      * @brief Resta dos matrices.
@@ -557,27 +615,26 @@ public:
      * @param a32 Valor para el elemento (3,2).
      * @param a33 Valor para el elemento (3,3).
      */
-    Matrix4(
-        double a00 = 1, double a01 = 0, double a02 = 0, double a03 = 0,
-        double a10 = 0, double a11 = 1, double a12 = 0, double a13 = 0,
-        double a20 = 0, double a21 = 0, double a22 = 1, double a23 = 0,
-        double a30 = 0, double a31 = 0, double a32 = 0, double a33 = 1) {
-          this->a00 = a00;
-          this->a01 = a01;
-          this->a02 = a02;
-          this->a03 = a03;
-          this->a10 = a10;
-          this->a11 = a11;
-          this->a12 = a12;
-          this->a13 = a13;
-          this->a20 = a20;
-          this->a21 = a21;
-          this->a22 = a22;
-          this->a23 = a23;
-          this->a30 = a30;
-          this->a31 = a31;
-          this->a32 = a32;
-          this->a33 = a33;
+    Matrix4(double a00 = 1, double a01 = 0, double a02 = 0, double a03 = 0,
+            double a10 = 0, double a11 = 1, double a12 = 0, double a13 = 0,
+            double a20 = 0, double a21 = 0, double a22 = 1, double a23 = 0,
+            double a30 = 0, double a31 = 0, double a32 = 0, double a33 = 1) {
+              this->a00 = a00;
+              this->a01 = a01;
+              this->a02 = a02;
+              this->a03 = a03;
+              this->a10 = a10;
+              this->a11 = a11;
+              this->a12 = a12;
+              this->a13 = a13;
+              this->a20 = a20;
+              this->a21 = a21;
+              this->a22 = a22;
+              this->a23 = a23;
+              this->a30 = a30;
+              this->a31 = a31;
+              this->a32 = a32;
+              this->a33 = a33;
         }
 
     /**
@@ -587,7 +644,10 @@ public:
      * @return Matrix4 Resultado de la suma de m1 y m2.
      */
     static Matrix4 add(const Matrix4& m1, const Matrix4& m2) {
-      return Matrix4();
+      return Matrix4(m1.a00+m2.a00, m1.a01+m2.a01, m1.a02+m2.a02, m1.a03+m2.a03,
+                     m1.a10+m2.a10, m1.a11+m2.a11, m1.a12+m2.a12, m1.a13+m2.a13,
+                     m1.a20+m2.a20, m1.a21+m2.a21, m1.a22+m2.a22, m1.a23+m2.a23,
+                     m1.a30+m2.a30, m1.a31+m2.a31, m1.a32+m2.a32, m1.a33+m2.a33);
     }
 
     /**
@@ -595,7 +655,27 @@ public:
      * @return Matrix4 Matriz adjunta.
      */
     Matrix4 adjoint() const {
-      return Matrix4();
+      Matrix3 m00(this->a11, this->a12, this->a13, this->a21, this->a22, this->a23, this->a31, this->a32, this->a33);
+      Matrix3 m10(this->a01, this->a02, this->a03, this->a21, this->a22, this->a23, this->a31, this->a32, this->a33);
+      Matrix3 m20(this->a01, this->a02, this->a03, this->a11, this->a12, this->a13, this->a31, this->a32, this->a33);
+      Matrix3 m30(this->a01, this->a02, this->a03, this->a11, this->a12, this->a13, this->a21, this->a23, this->a23);
+      Matrix3 m01(this->a10, this->a12, this->a13, this->a20, this->a22, this->a23, this->a30, this->a32, this->a33);
+      Matrix3 m11(this->a00, this->a02, this->a03, this->a20, this->a22, this->a23, this->a30, this->a32, this->a33);
+      Matrix3 m21(this->a00, this->a02, this->a03, this->a10, this->a12, this->a13, this->a30, this->a32, this->a33);
+      Matrix3 m31(this->a00, this->a02, this->a03, this->a10, this->a12, this->a13, this->a20, this->a22, this->a23);
+      Matrix3 m02(this->a10, this->a11, this->a13, this->a20, this->a21, this->a23, this->a30, this->a31, this->a33);
+      Matrix3 m12(this->a00, this->a01, this->a03, this->a20, this->a21, this->a23, this->a30, this->a31, this->a33);
+      Matrix3 m22(this->a00, this->a01, this->a03, this->a10, this->a11, this->a13, this->a30, this->a31, this->a33);
+      Matrix3 m32(this->a00, this->a01, this->a03, this->a10, this->a11, this->a13, this->a20, this->a21, this->a23);
+      Matrix3 m03(this->a10, this->a11, this->a12, this->a20, this->a21, this->a22, this->a30, this->a31, this->a32);
+      Matrix3 m13(this->a00, this->a01, this->a02, this->a20, this->a21, this->a22, this->a30, this->a31, this->a32);
+      Matrix3 m23(this->a00, this->a01, this->a02, this->a10, this->a11, this->a12, this->a30, this->a31, this->a32);
+      Matrix3 m33(this->a00, this->a01, this->a02, this->a10, this->a11, this->a12, this->a20, this->a21, this->a22);
+      Matrix4 cofactores(m00.determinant(),-m01.determinant(), m02.determinant(),-m03.determinant(),
+                        -m10.determinant(), m11.determinant(),-m12.determinant(), m13.determinant(),
+                         m20.determinant(),-m21.determinant(), m22.determinant(),-m23.determinant(),
+                        -m30.determinant(), m31.determinant(),-m32.determinant(), m33.determinant());
+      return cofactores.transpose();
     }
 
     /**
@@ -603,7 +683,10 @@ public:
      * @return Matrix4 Copia del objeto actual.
      */
     Matrix4 clone() const {
-      return Matrix4();
+      return Matrix4(this->a00, this->a01, this->a02, this->a03,
+                     this->a10, this->a11, this->a12, this->a13,
+                     this->a20, this->a21, this->a22, this->a23,
+                     this->a30, this->a31, this->a32, this->a33);
     }
 
     /**
@@ -611,8 +694,13 @@ public:
      * @return double Determinante de la matriz.
      */
     double determinant() const {
-      return 0;
+      Matrix3 m00(this->a11, this->a12, this->a13, this->a21, this->a22, this->a23, this->a31, this->a32, this->a33);
+      Matrix3 m01(this->a10, this->a12, this->a13, this->a20, this->a22, this->a23, this->a30, this->a32, this->a33);
+      Matrix3 m02(this->a10, this->a11, this->a13, this->a20, this->a21, this->a23, this->a30, this->a31, this->a33);
+      Matrix3 m03(this->a10, this->a11, this->a12, this->a20, this->a21, this->a22, this->a30, this->a31, this->a32);
+      return (this->a00*m00.determinant())-(this->a01*m01.determinant())+(this->a02*m02.determinant())-(this->a03*m03.determinant());
     }
+
     /**
      * @brief Verifica si dos matrices son aproximadamente iguales.
      * @param m1 Primera matriz.
@@ -621,7 +709,23 @@ public:
      * @return bool True si las matrices son aproximadamente iguales, false en caso contrario.
      */
     static bool equalsWithE(const Matrix4& m1, const Matrix4& m2, double epsilon) {
-      return false;
+      bool b00 = fabs(m1.a00-m2.a00) <= epsilon;
+      bool b01 = fabs(m1.a01-m2.a01) <= epsilon;
+      bool b02 = fabs(m1.a02-m2.a02) <= epsilon;
+      bool b03 = fabs(m1.a03-m2.a03) <= epsilon;
+      bool b10 = fabs(m1.a10-m2.a10) <= epsilon;
+      bool b11 = fabs(m1.a11-m2.a11) <= epsilon;
+      bool b12 = fabs(m1.a12-m2.a12) <= epsilon;
+      bool b13 = fabs(m1.a13-m2.a13) <= epsilon;
+      bool b20 = fabs(m1.a20-m2.a20) <= epsilon;
+      bool b21 = fabs(m1.a21-m2.a21) <= epsilon;
+      bool b22 = fabs(m1.a22-m2.a22) <= epsilon;
+      bool b23 = fabs(m1.a23-m2.a23) <= epsilon;
+      bool b30 = fabs(m1.a30-m2.a30) <= epsilon;
+      bool b31 = fabs(m1.a31-m2.a31) <= epsilon;
+      bool b32 = fabs(m1.a32-m2.a32) <= epsilon;
+      bool b33 = fabs(m1.a33-m2.a33) <= epsilon;
+      return b00 && b01 && b02 && b03 && b10 && b11 && b12 && b13 && b20 && b21 && b22 && b23 && b30 && b31 && b32 && b33;
     }
 
     /**
@@ -630,7 +734,10 @@ public:
      * @return Matrix4 Resultado de la multiplicación por el escalar.
      */
     Matrix4 multiplyByScalar(double scalar) const {
-      return Matrix4();
+      return Matrix4(this->a00*scalar, this->a01*scalar, this->a02*scalar, this->a03*scalar,
+                     this->a10*scalar, this->a11*scalar, this->a12*scalar, this->a13*scalar,
+                     this->a20*scalar, this->a21*scalar, this->a22*scalar, this->a23*scalar,
+                     this->a30*scalar, this->a31*scalar, this->a32*scalar, this->a33*scalar);
     }
 
     /**
@@ -640,7 +747,24 @@ public:
      * @return Matrix4 Resultado de la multiplicación de m1 y m2.
      */
     static Matrix4 multiply(const Matrix4& m1, const Matrix4& m2) {
-      return Matrix4();
+      return Matrix4(
+        (m1.a00*m2.a00) + (m1.a01*m2.a10) + (m1.a02*m2.a20) + (m1.a03*m2.a30),
+        (m1.a00*m2.a01) + (m1.a01*m2.a11) + (m1.a02*m2.a21) + (m1.a03*m2.a31),
+        (m1.a00*m2.a02) + (m1.a01*m2.a12) + (m1.a02*m2.a22) + (m1.a03*m2.a32),
+        (m1.a00*m2.a03) + (m1.a01*m2.a13) + (m1.a02*m2.a23) + (m1.a03*m2.a33),
+        (m1.a10*m2.a00) + (m1.a11*m2.a10) + (m1.a12*m2.a20) + (m1.a13*m2.a30),
+        (m1.a10*m2.a01) + (m1.a11*m2.a11) + (m1.a12*m2.a21) + (m1.a13*m2.a31),
+        (m1.a10*m2.a02) + (m1.a11*m2.a12) + (m1.a12*m2.a22) + (m1.a13*m2.a32),
+        (m1.a10*m2.a03) + (m1.a11*m2.a13) + (m1.a12*m2.a23) + (m1.a13*m2.a33),
+        (m1.a20*m2.a00) + (m1.a21*m2.a10) + (m1.a22*m2.a20) + (m1.a23*m2.a30),
+        (m1.a20*m2.a01) + (m1.a21*m2.a11) + (m1.a22*m2.a21) + (m1.a23*m2.a31),
+        (m1.a20*m2.a02) + (m1.a21*m2.a12) + (m1.a22*m2.a22) + (m1.a23*m2.a32),
+        (m1.a20*m2.a03) + (m1.a21*m2.a13) + (m1.a22*m2.a23) + (m1.a23*m2.a33),
+        (m1.a30*m2.a00) + (m1.a31*m2.a10) + (m1.a32*m2.a20) + (m1.a33*m2.a30),
+        (m1.a30*m2.a01) + (m1.a31*m2.a11) + (m1.a32*m2.a21) + (m1.a33*m2.a31),
+        (m1.a30*m2.a02) + (m1.a31*m2.a12) + (m1.a32*m2.a22) + (m1.a33*m2.a32),
+        (m1.a30*m2.a03) + (m1.a31*m2.a13) + (m1.a32*m2.a23) + (m1.a33*m2.a33)
+      );
     }
 
     /**
@@ -649,7 +773,12 @@ public:
      * @throws std::runtime_error Si la matriz es singular (determinante cercano a cero).
      */
     Matrix4 invert() const {
-      return Matrix4();
+      double det = this->determinant();
+      Matrix4 adjunta = this->adjoint();
+      if (det == 0) {
+        throw runtime_error("La matriz es singular (determinante cercano a cero)");
+      }
+      return adjunta.multiplyByScalar(1/det);
     }
 
     /**
@@ -657,8 +786,11 @@ public:
      * @return Matrix4& Referencia a la matriz actual.
      */
     Matrix4& identity() {
-      static Matrix4 temp;
-      return temp;
+      this->a00 = 1; this->a01 = 0; this->a02 = 0; this->a03 = 0;
+      this->a10 = 0; this->a11 = 1; this->a12 = 0; this->a13 = 0;
+      this->a20 = 0; this->a21 = 0; this->a22 = 1; this->a23 = 0;
+      this->a30 = 0; this->a31 = 0; this->a32 = 0; this->a33 = 1;
+      return *this;
     }
 
     /**
@@ -668,7 +800,12 @@ public:
      * @return Matrix4 Resultado de la multiplicación por el escalar.
      */
     static Matrix4 multiplyScalar(const Matrix4& m1, double c) {
-      return Matrix4();
+      return Matrix4(
+        m1.a00*c, m1.a01*c, m1.a02*c, m1.a03*c,
+        m1.a10*c, m1.a11*c, m1.a12*c, m1.a13*c,
+        m1.a20*c, m1.a21*c, m1.a22*c, m1.a23*c,
+        m1.a30*c, m1.a31*c, m1.a32*c, m1.a33*c
+      );
     }
 
     /**
@@ -677,7 +814,10 @@ public:
      * @return Vector4 Resultado de la multiplicación del vector por la matriz.
      */
     Vector4 multiplyVector(const Vector4& v) const {
-      return Vector4();
+      return Vector4(this->a00*v.getX()+this->a01*v.getY()+this->a02*v.getZ()+this->a03*v.getW(),
+                     this->a10*v.getX()+this->a11*v.getY()+this->a12*v.getZ()+this->a13*v.getW(),
+                     this->a20*v.getX()+this->a21*v.getY()+this->a22*v.getZ()+this->a23*v.getW(),
+                     this->a30*v.getX()+this->a31*v.getY()+this->a32*v.getZ()+this->a33*v.getW());
     }
 
     /**
@@ -700,9 +840,15 @@ public:
      * @param a33 Valor para el elemento (3,3).
      * @return Matrix4& Referencia a la matriz actual.
      */
-    Matrix4& set() {
-      static Matrix4 temp;
-      return temp;
+    Matrix4& set(double a00, double a01, double a02, double a03,
+                 double a10, double a11, double a12, double a13,
+                 double a20, double a21, double a22, double a23,
+                 double a30, double a31, double a32, double a33) {
+      this->a00 = a00; this->a01 = a01; this->a02 = a02; this->a03 = a03;
+      this->a10 = a00; this->a11 = a01; this->a12 = a02; this->a13 = a13;
+      this->a20 = a00; this->a21 = a01; this->a22 = a02; this->a23 = a23;
+      this->a30 = a00; this->a31 = a01; this->a32 = a02; this->a33 = a33;
+      return *this;
     }
 
     /**
@@ -712,7 +858,12 @@ public:
      * @return Matrix4 Resultado de la resta de m1 y m2.
      */
     static Matrix4 subtract(const Matrix4& m1, const Matrix4& m2) {
-      return Matrix4();
+      return Matrix4(
+        m1.a00-m2.a00, m1.a01-m2.a01, m1.a02-m2.a02, m1.a03-m2.a03,
+        m1.a10-m2.a10, m1.a11-m2.a11, m1.a12-m2.a12, m1.a13-m2.a13,
+        m1.a20-m2.a20, m1.a21-m2.a21, m1.a22-m2.a22, m1.a23-m2.a23,
+        m1.a30-m2.a30, m1.a31-m2.a31, m1.a32-m2.a32, m1.a33-m2.a33
+      );
     }
 
     /**
@@ -720,9 +871,13 @@ public:
      * @return Matrix4 Matriz transpuesta.
      */
     Matrix4 transpose() const {
-      return Matrix4();
+      return Matrix4(
+        this->a00, this->a10, this->a20, this->a30,
+        this->a01, this->a11, this->a21, this->a31,
+        this->a02, this->a12, this->a22, this->a32,
+        this->a03, this->a13, this->a23, this->a33
+      );
     }
-
 
     // Métodos estáticos de matrices de transformaciones de cámara
 
@@ -840,6 +995,7 @@ public:
 //Aqui empiezan las pruebas
 int main() {
     // Pruebas para Vector3
+/*
     cout << "Pruebas para Vector3:" << endl;
 
     // Crear vectores
@@ -865,9 +1021,9 @@ int main() {
 
     bool areExactEqual = Vector3::exactEquals(v1, v2);
     cout << "v1 y v2 son exactamente iguales: " << (areExactEqual ? "Sí" : "No") << endl;
-
-
+*/
     // Pruebas para Matrix3
+/*
     cout << "\nPruebas para Matrix3:" << endl;
 
     // Crear matrices
@@ -948,8 +1104,9 @@ int main() {
     cout << m12.a00 << " " << m12.a01 << " " << m12.a02 << endl;
     cout << m12.a10 << " " << m12.a11 << " " << m12.a12 << endl;
     cout << m12.a20 << " " << m12.a21 << " " << m12.a22 << endl;
-
-    //ejemplos vector4
+*/
+    //Pruebas Vector4
+/*
     Vector4 vectorA(1, 2, 3, 4);
     Vector4 vectorB(5, 6, 7, 8);
 
@@ -976,9 +1133,10 @@ int main() {
     cout << "Difference Vector4: (" << differenceVector.x << ", " << differenceVector.y << ", " << differenceVector.z << ", " << differenceVector.w << ")\n";
     cout << "Squared Distance: " << squaredDistance << "\n";
     cout << "Vector a cero: (" << vectorA.x << ", " << vectorA.y << ", " << vectorA.z << ", " << vectorA.w << ")\n";
-
+*/
     //pruebas Matrix4
-        // Crear matrices
+/*
+    // Crear matrices
     Matrix4 mat1(1, 2, 3, 4,
                  5, 6, 7, 8,
                  9, 10, 11, 12,
@@ -1031,6 +1189,6 @@ int main() {
     cout << " " << result.a10 << " " << result.a11 << " " << result.a12 << " " << result.a13 << endl;
     cout << " " << result.a20 << " " << result.a21 << " " << result.a22 << " " << result.a23 << endl;
     cout << " " << result.a30 << " " << result.a31 << " " << result.a32 << " " << result.a33 << endl;
-
+*/
     return 0;
 }
