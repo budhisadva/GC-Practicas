@@ -521,6 +521,12 @@ public:
                      this->a01, this->a11, this->a21,
                      this->a02, this->a12, this->a22);
     }
+
+    static Matrix3 viewport(double w, double h){
+      return Matrix3(w/2.0, 0, w/2.0,
+                     0, h/2.0, h/2.0,
+                     0, 0, 1);
+    }
 };
 /**
  * @class Matrix4
