@@ -22,7 +22,7 @@ std::vector<Vector3> vectoriza(int grados, int width, int height) {
     vertices_modelo.push_back( M_modelo.multiplyVector(vertices_global[i]) );
   }
   std::vector<Vector4> vertices_vista;
-  Matrix4 M_camara = Matrix4::lookAt(Vector3(0,2,10), Vector3(0,0,0), Vector3(0,1,0));
+  Matrix4 M_camara = Matrix4::lookAt(Vector3(0,9,10), Vector3(0,0,0), Vector3(0,1,0));
   Matrix4 M_vista = Matrix4::multiply(M_camara, M_modelo);
   for (int i = 0; i < vertices_modelo.size(); i++) {
     vertices_vista.push_back( M_vista.multiplyVector(vertices_modelo[i]) );

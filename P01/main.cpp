@@ -7,7 +7,7 @@
 const int width = 800;
 const int height = 600;
 std::vector<uint8_t> pixels;
-uint32_t BLANCO = 0xFFFFFFFF, NEGRO = 0x00000000;
+uint32_t BLANCO = 0xFFFFFFFF, NEGRO = 0x000000FF;
 
 void initPixels(uint32_t color){
   pixels.reserve(width * height * 4);
