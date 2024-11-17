@@ -60,13 +60,13 @@ void bresenham(int x0, int y0, int x1, int y1, uint32_t color) {
   }
 }
 
-int main() {
+int main(int argc, char* argv[]) {
   sf::Texture texture;
   texture.create(width, height);
   sf::RenderWindow window(sf::VideoMode(width, height), "Trazado de lineas");
-  int gradosY = 0, gradosX = 0;
-  bool EJECUTAR = true;
+  int gradosY = 0;
   double escalamiento = 1;
+  bool EJECUTAR = true;
   while (window.isOpen()) {
     sf::Event event;
     while (window.pollEvent(event)) {
@@ -75,29 +75,43 @@ int main() {
       }
       if (event.type == sf::Event::KeyPressed) {
         if (event.key.code == sf::Keyboard::Left) {
-          EJECUTAR = true;
           gradosY++;
         } else if (event.key.code == sf::Keyboard::Right) {
-          EJECUTAR = true;
           gradosY--;
         }
-        if (event.key.code == sf::Keyboard::Up) {
-          EJECUTAR = true;
-          gradosX++;
-        } else if (event.key.code == sf::Keyboard::Down) {
-          EJECUTAR = true;
-          gradosX--;
+        EJECUTAR = true;
+      }
+      if (event.type == sf::Event::MouseWheelScrolled) {
+        if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel) {
+          float delta = event.mouseWheelScroll.delta;
+          if (escalamiento < 0.2) {
+            escalamiento = 0.2;
+          } else if (0.2 <= escalamiento && escalamiento < 1) {
+            escalamiento += 0.1 * delta;
+          } else if (1 <= escalamiento && escalamiento <= 10) {
+            if (escalamiento == 1 && delta < 0) {
+              escalamiento = 0.9;
+            } else {
+              escalamiento += delta;
+            }
+          } else {
+            escalamiento = 10;
+          }
         }
+        EJECUTAR = true;
       }
     }
     if (EJECUTAR) {
       initPixels(NEGRO);
-      std::vector<Vector3> vertices_vp = vectoriza(gradosY, gradosX, escalamiento, width, height);
+      std::vector<Vector3> vertices_vp = vectoriza(gradosY, escalamiento, width, height, argv[1]);
       // Pinta vertices
       for (int i = 0; i < vertices_vp.size(); i++) {
-        pinta(vertices_vp[i].getX(), vertices_vp[i].getY(), BLANCO);
+        if (vertices_vp[i].getX() >= 0 && vertices_vp[i].getX() <= width) {
+          if (vertices_vp[i].getY() >= 0 && vertices_vp[i].getY() <= height) {
+            pinta(vertices_vp[i].getX(), vertices_vp[i].getY(), BLANCO);
+          }
+        }
       }
-      // pinta caras
       texture.update(pixels.data());
       sf::Sprite sprite(texture);
       window.clear();
