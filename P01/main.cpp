@@ -61,10 +61,12 @@ void bresenham(int x0, int y0, int x1, int y1, uint32_t color) {
 }
 
 int main() {
-  int grados = 0;
   sf::Texture texture;
   texture.create(width, height);
   sf::RenderWindow window(sf::VideoMode(width, height), "Trazado de lineas");
+  int gradosY = 0, gradosX = 0;
+  bool EJECUTAR = true;
+  double escalamiento = 1;
   while (window.isOpen()) {
     sf::Event event;
     while (window.pollEvent(event)) {
@@ -73,39 +75,36 @@ int main() {
       }
       if (event.type == sf::Event::KeyPressed) {
         if (event.key.code == sf::Keyboard::Left) {
-          grados++;
+          EJECUTAR = true;
+          gradosY++;
         } else if (event.key.code == sf::Keyboard::Right) {
-          grados--;
+          EJECUTAR = true;
+          gradosY--;
+        }
+        if (event.key.code == sf::Keyboard::Up) {
+          EJECUTAR = true;
+          gradosX++;
+        } else if (event.key.code == sf::Keyboard::Down) {
+          EJECUTAR = true;
+          gradosX--;
         }
       }
     }
-    initPixels(BLANCO);
-    std::vector<Vector3> vertices_vp = vectoriza(grados, width, height);
-    for (int i = 0; i < vertices_vp.size(); i++) {
-      pinta(vertices_vp[i].getX(), vertices_vp[i].getY(), NEGRO);
+    if (EJECUTAR) {
+      initPixels(NEGRO);
+      std::vector<Vector3> vertices_vp = vectoriza(gradosY, gradosX, escalamiento, width, height);
+      // Pinta vertices
+      for (int i = 0; i < vertices_vp.size(); i++) {
+        pinta(vertices_vp[i].getX(), vertices_vp[i].getY(), BLANCO);
+      }
+      // pinta caras
+      texture.update(pixels.data());
+      sf::Sprite sprite(texture);
+      window.clear();
+      window.draw(sprite);
+      window.display();
+      EJECUTAR = false;
     }
-    bresenham(vertices_vp[0].getX(), vertices_vp[0].getY(), vertices_vp[1].getX(), vertices_vp[1].getY(), NEGRO);
-    bresenham(vertices_vp[0].getX(), vertices_vp[0].getY(), vertices_vp[3].getX(), vertices_vp[3].getY(), NEGRO);
-    bresenham(vertices_vp[0].getX(), vertices_vp[0].getY(), vertices_vp[4].getX(), vertices_vp[4].getY(), NEGRO);
-    bresenham(vertices_vp[2].getX(), vertices_vp[2].getY(), vertices_vp[1].getX(), vertices_vp[1].getY(), NEGRO);
-    bresenham(vertices_vp[2].getX(), vertices_vp[2].getY(), vertices_vp[3].getX(), vertices_vp[3].getY(), NEGRO);
-    bresenham(vertices_vp[2].getX(), vertices_vp[2].getY(), vertices_vp[6].getX(), vertices_vp[6].getY(), NEGRO);
-    bresenham(vertices_vp[5].getX(), vertices_vp[5].getY(), vertices_vp[4].getX(), vertices_vp[4].getY(), NEGRO);
-    bresenham(vertices_vp[5].getX(), vertices_vp[5].getY(), vertices_vp[6].getX(), vertices_vp[6].getY(), NEGRO);
-    bresenham(vertices_vp[5].getX(), vertices_vp[5].getY(), vertices_vp[1].getX(), vertices_vp[1].getY(), NEGRO);
-    bresenham(vertices_vp[7].getX(), vertices_vp[7].getY(), vertices_vp[4].getX(), vertices_vp[4].getY(), NEGRO);
-    bresenham(vertices_vp[7].getX(), vertices_vp[7].getY(), vertices_vp[6].getX(), vertices_vp[6].getY(), NEGRO);
-    bresenham(vertices_vp[7].getX(), vertices_vp[7].getY(), vertices_vp[3].getX(), vertices_vp[3].getY(), NEGRO);
-    bresenham(vertices_vp[0].getX(), vertices_vp[0].getY(), vertices_vp[2].getX(), vertices_vp[2].getY(), 0x0000FFFF);
-    bresenham(vertices_vp[1].getX(), vertices_vp[1].getY(), vertices_vp[3].getX(), vertices_vp[3].getY(), 0x0000FFFF);
-    bresenham(vertices_vp[4].getX(), vertices_vp[4].getY(), vertices_vp[6].getX(), vertices_vp[6].getY(), 0xFF0000FF);
-    bresenham(vertices_vp[5].getX(), vertices_vp[5].getY(), vertices_vp[7].getX(), vertices_vp[7].getY(), 0xFF0000FF);
-    pinta(vertices_vp[8].getX(), vertices_vp[8].getY(), 0xe51abeFF);
-    texture.update(pixels.data());
-    sf::Sprite sprite(texture);
-    window.clear();
-    window.draw(sprite);
-    window.display();
   }
   return 0;
 }
