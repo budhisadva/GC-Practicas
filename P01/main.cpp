@@ -31,39 +31,10 @@ void pinta(int x, int y, uint32_t color) {
   pixels[index + 3] = color & 0xFF;
 }
 
-void bresenham(int x0, int y0, int x1, int y1, uint32_t color) {
-  int sx, sy, error, e2;
-  int dx = std::abs(x1-x0);
-  int dy = std::abs(y1-y0);
-  if (x0 < x1) {
-    sx = 1;
-  } else {
-    sx = -1;
-  }
-  if (y0 < y1) {
-    sy = 1;
-  } else {
-    sy = -1;
-  }
-  error = dx-dy;
-  while (x0 != x1 || y0 != y1 ) {
-    pinta(x0, y0, color);
-    e2 = 2*error;
-    if (e2 > -dy) {
-      error = error-dy;
-      x0 = x0+sx;
-    }
-    if (e2 < dx) {
-      error = error+dx;
-      y0 = y0+sy;
-    }
-  }
-}
-
 int main(int argc, char* argv[]) {
   sf::Texture texture;
   texture.create(width, height);
-  sf::RenderWindow window(sf::VideoMode(width, height), "Trazado de lineas");
+  sf::RenderWindow window(sf::VideoMode(width, height), "Proyecto medio Semestre");
   int gradosY = 0;
   double escalamiento = 1;
   bool EJECUTAR = true;
@@ -104,7 +75,6 @@ int main(int argc, char* argv[]) {
     if (EJECUTAR) {
       initPixels(NEGRO);
       std::vector<Vector3> vertices_vp = vectoriza(gradosY, escalamiento, width, height, argv[1]);
-      // Pinta vertices
       for (int i = 0; i < vertices_vp.size(); i++) {
         if (vertices_vp[i].getX() >= 0 && vertices_vp[i].getX() <= width) {
           if (vertices_vp[i].getY() >= 0 && vertices_vp[i].getY() <= height) {
