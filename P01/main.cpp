@@ -31,6 +31,35 @@ void pinta(int x, int y, uint32_t color) {
   pixels[index + 3] = color & 0xFF;
 }
 
+void bresenham(int x0, int y0, int x1, int y1, uint32_t color) {
+  int sx, sy, error, e2;
+  int dx = std::abs(x1-x0);
+  int dy = std::abs(y1-y0);
+  if (x0 < x1) {
+    sx = 1;
+  } else {
+    sx = -1;
+  }
+  if (y0 < y1) {
+    sy = 1;
+  } else {
+    sy = -1;
+  }
+  error = dx-dy;
+  while (x0 != x1 || y0 != y1 ) {
+    pinta(x0, y0, color);
+    e2 = 2*error;
+    if (e2 > -dy) {
+      error = error-dy;
+      x0 = x0+sx;
+    }
+    if (e2 < dx) {
+      error = error+dx;
+      y0 = y0+sy;
+    }
+  }
+}
+
 int main(int argc, char* argv[]) {
   sf::Texture texture;
   texture.create(width, height);
@@ -81,6 +110,16 @@ int main(int argc, char* argv[]) {
             pinta(vertices_vp[i].getX(), vertices_vp[i].getY(), BLANCO);
           }
         }
+      }
+      std::vector<int> indices = get_indices();
+      for (int i = 0; i < indices_vertices.size() / 3; i++) {
+        int k, l, m;
+        k = indices_vertices[i * 3];
+        l = indices_vertices[i * 3 + 1];
+        m = indices_vertices[i * 3 + 2];
+        bresenham(vertices_vp[k].getX(), vertices_vp[k].getY(), vertices_vp[l].getX(), vertices_vp[l].getY(), BLANCO);
+        bresenham(vertices_vp[l].getX(), vertices_vp[l].getY(), vertices_vp[m].getX(), vertices_vp[m].getY(), BLANCO);
+        bresenham(vertices_vp[m].getX(), vertices_vp[m].getY(), vertices_vp[k].getX(), vertices_vp[k].getY(), BLANCO);
       }
       texture.update(pixels.data());
       sf::Sprite sprite(texture);

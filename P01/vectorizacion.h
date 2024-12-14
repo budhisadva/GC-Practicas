@@ -9,6 +9,7 @@ std::vector<Vector4> vertices_global;
 bool EJECUTA = true;
 double maximos[3] = {0,0,0};
 double minimos[3] = {0,0,0};
+std::vector<int> indices_vertices;
 
 void leeOBJ(std::string nombre) {
   std::ifstream file(nombre);
@@ -39,6 +40,21 @@ void leeOBJ(std::string nombre) {
       vertices_global.push_back(Vector4(x, y, z, 1));
       vertices++;
     } else if (line[0] == 'f' && line[1] == ' ') {
+      std::istringstream iss(line.substr(2));
+      std::vector<int> f;
+      std::string vertex;
+      while (iss >> vertex) {
+        std::istringstream viss(vertex);
+        std::string index;
+        int vIdx = -1;
+        if (std::getline(viss, index, '/')) {
+          vIdx = !index.empty() ? std::stoi(index) - 1 : -1;
+        }
+        f.push_back(vIdx);
+      }
+      indices_vertices.push_back(f[0]);
+      indices_vertices.push_back(f[1]);
+      indices_vertices.push_back(f[2]);
       caras++;
     }
   }
@@ -55,7 +71,8 @@ std::vector<Vector3> vectoriza(int gradosY, double escalamiento, int width, int 
   std::vector<Vector4> vertices_modelo;
   double thetaY = (gradosY*M_PI)/180.0;
   Matrix4 M_rotarY = Matrix4::rotateY(thetaY);
-  Matrix4 M_escalar = Matrix4::scale(escalamiento, escalamiento, escalamiento);
+  // Matrix4 M_escalar = Matrix4::scale(escalamiento, escalamiento, escalamiento);
+  Matrix4 M_escalar = Matrix4::scale(0.4, 0.4, 0.4);
   Matrix4 M_modelo = Matrix4::multiply(M_rotarY, M_escalar);
   for (int i = 0; i < vertices_global.size(); i++) {
     vertices_modelo.push_back( M_modelo.multiplyVector(vertices_global[i]) );
@@ -66,9 +83,9 @@ std::vector<Vector3> vectoriza(int gradosY, double escalamiento, int width, int 
     max[i] = maximos[i] * escalamiento;
     min[i] = minimos[i] * escalamiento;
   }
-  Vector3 suma = Vector3::add(Vector3(max[0], max[1], max[2]), Vector3(min[0], min[1], min[2]));
+  Vector3 suma = Vector3::add(Vector3(0, max[1], 0), Vector3(0, min[1], 0));
   suma.set(suma.getX()*0.5, suma.getY()*0.5, suma.getZ()*0.5);
-  Matrix4 M_camara = Matrix4::lookAt(Vector3(10,2,10), suma, Vector3(0,-1,0));
+  Matrix4 M_camara = Matrix4::lookAt(Vector3(0,-5,-15), Vector3(), Vector3(0,-1,0));
   Matrix4 M_vista = Matrix4::multiply(M_camara, M_modelo);
   for (int i = 0; i < vertices_modelo.size(); i++) {
     vertices_vista.push_back( M_vista.multiplyVector(vertices_modelo[i]) );
@@ -89,4 +106,8 @@ std::vector<Vector3> vectoriza(int gradosY, double escalamiento, int width, int 
   }
   EJECUTA = false;
   return vertices_vp;
+}
+
+std::vector<int> get_indices() {
+  return indices_vertices;
 }
