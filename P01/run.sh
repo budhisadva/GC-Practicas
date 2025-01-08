@@ -6,3 +6,4 @@ g++ main.cpp -o plano.out -lsfml-graphics -lsfml-window -lsfml-system
 #02_Cube_Triangles
 #03_Teapot
 #04_bunny
+#crash.obj
